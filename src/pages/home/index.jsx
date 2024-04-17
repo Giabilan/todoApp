@@ -1,51 +1,69 @@
-import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
 
 export const Home = () => {
-  const [addTodo, setAddTodo] = useState(null);
-  const [todoList, setTodoList] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    console.log(todoList);
-  }, [todoList]);
-
-  const handleAddTodo = () => {
-    setAddTodo(true);
-  };
-
-  const formValidate = () => {
-    if (inputValue !== "") {
-      handleAddTodo();
-      setError(false);
-    } else {
-      setError(true);
-      console.log("error");
-    }
-  };
-
   const handleChange = (event) => {
     setInputValue(event);
-    formValidate();
+    setError(false);
+  };
+
+  const handleAddTodoClick = () => {
+    if (inputValue !== "") {
+      const newTodo = { todo: inputValue, id: Date.now() };
+      setTodos([...todos, newTodo]);
+      setInputValue("");
+    } else {
+      setError(true);
+    }
+    return;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleAddTodoClick();
+  };
+
+  const handleDeleteClick = (id) => {
+    const newArray = todos.filter((todo) => todo.id !== id);
+    setTodos(newArray);
   };
 
   return (
     <div>
-      <div className="flex justify-center gap-6 bg-neutral-800 p-4 ">
-        <div
-          className={`p-4 rounded-full cursor-pointer ${
-            addTodo ? "bg-red-500" : "bg-white"
-          } `}
-          onClick={formValidate}
-        ></div>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={inputValue}
-          className="p-1  text-black "
-          onChange={(event) => handleChange(event.target.value)}
-        />
+      <div className="flex flex-col items-center justify-center bg-neutral-800 p-4 ">
+        <form onSubmit={handleSubmit} className="">
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value={inputValue}
+            className="p-2  text-black rounded-l-lg "
+            onChange={(event) => handleChange(event.target.value)}
+          />
+          <button
+            type="submit"
+            className="bg-indigo-500 p-2 rounded-r-lg hover:bg-indigo-400 "
+          >
+            Ajouter
+          </button>
+        </form>
+        <div className="mt-4">
+          {todos.length > 0 &&
+            todos.map((todo, index) => (
+              <div className="flex items-center gap-1" key={index}>
+                <li> {todo.todo} </li>
+                <Trash2
+                  size={30}
+                  className="cursor-pointer p-1 bg-indigo-500 hover:bg-indigo-400 rounded-lg "
+                  onClick={() => handleDeleteClick(todo.id)}
+                />
+              </div>
+            ))}
+        </div>
         <div className=""> {error && <p> empty input </p>} </div>
       </div>
     </div>
